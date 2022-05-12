@@ -1,0 +1,77 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "kalix/annotations.proto";
+import "google/api/annotations.proto";
+
+package com.example;
+
+message PingValue {
+    string pingpong_id = 1 [(kalix.field).entity_key = true];
+    
+}
+
+message PongValue {
+    string pingpong_id = 1 [(kalix.field).entity_key = true];
+    
+}
+
+message ResetValue {
+    string pingpong_id = 1 [(kalix.field).entity_key = true];
+}
+
+message GetPingPong {
+    string pingpong_id = 1 [(kalix.field).entity_key = true];
+}
+
+message CurrentPingPong {
+    bool pinged = 1;
+}
+
+service PingPongService {
+    option (kalix.service) = {
+        type : SERVICE_TYPE_ENTITY
+        component : "com.example.domain.PingPong"
+    };
+
+    rpc Ping(PingValue) returns (google.protobuf.Empty) {
+        option (kalix.method).eventing.in = {
+            topic: "pings"
+        };
+    }
+    rpc Pong(PongValue) returns (google.protobuf.Empty) {
+        option (kalix.method).eventing.in = {
+            topic: "pongs"
+        };
+    }
+
+
+    rpc GetCurrentPingPong(GetPingPong) returns (CurrentPingPong);
+}
+
+service PingPongHttpService {
+    option (kalix.service) = {
+        type : SERVICE_TYPE_ACTION
+    };
+
+    rpc HttpPing(PingValue) returns (PingValue) {
+        option (google.api.http) = {
+            put: "/pings/{pingpong_id}"
+        }; 
+        option (kalix.method).eventing.out = {
+            topic: "pings"
+        };    
+    }
+
+    rpc HttpPong(PongValue) returns (PongValue) {
+        option (google.api.http) = {
+            put: "/pongs/{pingpong_id}"
+        }; 
+        option (kalix.method).eventing.out = {
+            topic: "pongs"
+        };    
+    }
+
+
+}

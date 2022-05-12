@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.example.domain;
+
+import "kalix/annotations.proto";
+
+option (kalix.file).value_entity = {
+    name: "PingPong"
+    entity_type: "pingpong"
+    state: "PingPongState"
+};
+
+message PingPongState {
+    bool pinged = 1;
+}
